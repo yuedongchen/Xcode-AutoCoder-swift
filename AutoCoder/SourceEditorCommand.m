@@ -39,15 +39,19 @@
                 NSMutableArray *resultArray = [self makeResultStringArray];
                 
                 for (int i = (int)invocation.buffer.lines.count - 1; i > 0 ; i--) {
+                    
                     NSString *stringend = stringArray[i];
+                    
                     if ([stringend containsString:@"@end"]) {
+                        
                         for (int j = (int)resultArray.count - 1; j >= 0; j--) {
                             NSArray *array = resultArray[j];
                             for (int x = (int)(array.count - 1); x >= 0; x--) {
                                 [invocation.buffer.lines insertObject:array[x] atIndex:i - 1];
                             }
                         }
-                    } else if ([stringend containsString:@"@implementation"]) {
+
+                    } else if ([stringend hasPrefix:@"class"]) {
                         if (completionHandler) {
                             completionHandler(nil);
                         }
@@ -74,8 +78,8 @@
 
 - (void)predicateForImports:(NSString *)string
 {
-    if ([string containsString:@"#import"]) {
-        
+    if ([string containsString:@"import"]) {
+
         if ([string containsString:@"Cell"]) {
             NSString *cellName = [string substringWithRange:NSMakeRange(9, string.length - 13)];
             [self.cellsArray addObject:cellName];
@@ -86,33 +90,18 @@
             NSString *footerName = [string substringWithRange:NSMakeRange(9, string.length - 13)];
             [self.footersArray addObject:footerName];
         }
-        
+
     }
 }
 
 - (void)predicateForProperty:(NSString *)string
 {
-    NSString *str = string;
-    NSPredicate *pre = [NSPredicate predicateWithFormat:@"SELF MATCHES %@", @"^@property.*;\\n$"];
-    if ([pre evaluateWithObject:str]) {
-        //这是一个property.
-        if ([str containsString:@"*"] && ![str containsString:@"IBOutlet"] && ![str containsString:@"^"] && ![str containsString:@"//"]) {
-            NSString *category = @"";
-            NSString *name = @"";
-            
-            NSRange range1 = [str rangeOfString:@"\\).*\\*" options:NSRegularExpressionSearch];
-            NSString *string1 = [str substringWithRange:range1];
-            NSRange range2 = [string1 rangeOfString:@"[a-zA-Z0-9_]+" options:NSRegularExpressionSearch];
-            category = [string1 substringWithRange:range2];
-            
-            NSRange range3 = [str rangeOfString:@"\\*.*;" options:NSRegularExpressionSearch];
-            NSString *string2 = [str substringWithRange:range3];
-            NSRange range4 = [string2 rangeOfString:@"[a-zA-Z0-9_]+" options:NSRegularExpressionSearch];
-            name = [string2 substringWithRange:range4];
-            
-            NSDictionary *dic = @{@"category" : category, @"name" : name};
-            [self.indexsArray addObject:dic];
-        }
+    if ([string hasPrefix:@"@property"]) {
+        NSArray *stringArray = [string componentsSeparatedByString:@":"];
+        NSString *category = stringArray[2];
+        category = [category stringByReplacingOccurrencesOfString:@"\n" withString:@""];
+        NSDictionary *dic = @{@"category" : category, @"name" : stringArray[1]};
+        [self.indexsArray addObject:dic];
     }
 }
 
@@ -120,21 +109,23 @@
 - (void)beginPredicate:(NSString *)string
 {
     NSString *str = string;
-    if ([str containsString:@"@interface"]) {
+    if ([str containsString:@"@start"]) {
         self.predicate = YES;
-        // 简单判断是 vc 还是 view
-        if ([str containsString:@"ViewController"]) {
-            self.isVc = YES;
-        } else {
-            self.isVc = NO;
-        }
     }
 }
 
 - (BOOL)endPredicate:(NSString *)string
 {
-    if ([string containsString:@"@end"]) {
+    if ([string hasPrefix:@"class"]) {
         self.predicate = NO;
+        
+        // 简单判断是 vc 还是 view
+        if ([string containsString:@"ViewController"]) {
+            self.isVc = YES;
+        } else {
+            self.isVc = NO;
+        }
+        
         return YES;
     }
     return NO;
