@@ -81,14 +81,14 @@
     if ([string containsString:@"import"]) {
 
         if ([string containsString:@"Cell"]) {
-            NSString *cellName = [string substringWithRange:NSMakeRange(9, string.length - 13)];
-            [self.cellsArray addObject:cellName];
+            NSString *cellName = [string substringWithRange:NSMakeRange(7, string.length - 7)];
+            [self.cellsArray addObject:[cellName stringByReplacingOccurrencesOfString:@"\n" withString:@""]];
         } else if ([string containsString:@"Header"]) {
-            NSString *headerName = [string substringWithRange:NSMakeRange(9, string.length - 13)];
-            [self.headersArray addObject:headerName];
+            NSString *headerName = [string substringWithRange:NSMakeRange(7, string.length - 7)];
+            [self.headersArray addObject:[headerName stringByReplacingOccurrencesOfString:@"\n" withString:@""]];
         } else if ([string containsString:@"Footer"]) {
-            NSString *footerName = [string substringWithRange:NSMakeRange(9, string.length - 13)];
-            [self.footersArray addObject:footerName];
+            NSString *footerName = [string substringWithRange:NSMakeRange(7, string.length - 7)];
+            [self.footersArray addObject:[footerName stringByReplacingOccurrencesOfString:@"\n" withString:@""]];
         }
 
     }
@@ -154,13 +154,13 @@
     NSMutableArray *itemsArray = [[NSMutableArray alloc] init];
     
     NSString *line0 = [NSString stringWithFormat:@""];
-    NSString *line1 = [NSString stringWithFormat:@"- (instancetype)initWithFrame:(CGRect)frame"];
-    NSString *line2 = [NSString stringWithFormat:@"{"];
-    NSString *line3 = [NSString stringWithFormat:@"    if (self = [super initWithFrame:frame]) {"];
-    NSString *line4 = [NSString stringWithFormat:@"        [self configSubViews];"];
-    NSString *line5 = [NSString stringWithFormat:@"    }"];
-    NSString *line6 = [NSString stringWithFormat:@"    return self;"];
-    NSString *line7 = [NSString stringWithFormat:@"}"];
+    NSString *line1 = [NSString stringWithFormat:@"    override init(frame: CGRect) {"];
+    NSString *line2 = [NSString stringWithFormat:@"        super.init(frame: frame)"];
+    NSString *line3 = [NSString stringWithFormat:@"        self.configSubViews()"];
+    NSString *line4 = [NSString stringWithFormat:@"    }"];
+    NSString *line5 = [NSString stringWithFormat:@"    required init?(coder: NSCoder) {"];
+    NSString *line6 = [NSString stringWithFormat:@"        fatalError(\"init(coder:) has not been implemented\")"];
+    NSString *line7 = [NSString stringWithFormat:@"    }"];
     
     NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line7, nil];
     
@@ -175,9 +175,8 @@
     NSMutableArray *itemsArray = [[NSMutableArray alloc] init];
     
     NSString *line0 = [NSString stringWithFormat:@""];
-    NSString *line1 = [NSString stringWithFormat:@"- (void)configSubViews"];
-    NSString *line2 = [NSString stringWithFormat:@"{"];
-    NSMutableArray *lineArrays0 = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, nil];
+    NSString *line1 = [NSString stringWithFormat:@"    func configSubViews() {"];
+    NSMutableArray *lineArrays0 = [[NSMutableArray alloc] initWithObjects:line0, line1, nil];
     [itemsArray addObject:lineArrays0];
     
     for (int i = 0; i < self.indexsArray.count; i++) {
@@ -186,9 +185,9 @@
         
         NSString *line0 = nil;
         if (self.isVc) {
-            line0 = [NSString stringWithFormat:@"    [self.view addSubview:self.%@];", nameStr];
+            line0 = [NSString stringWithFormat:@"        self.view.addSubview(self.%@)", nameStr];
         } else {
-            line0 = [NSString stringWithFormat:@"    [self addSubview:self.%@];", nameStr];
+            line0 = [NSString stringWithFormat:@"        self.addSubview(self.%@)", nameStr];
         }
         
         NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, nil];
@@ -199,15 +198,15 @@
         
         NSString *nameStr = self.indexsArray[i][@"name"];
         
-        NSString *line0 = [NSString stringWithFormat:@"    [self.%@ mas_makeConstraints:^(MASConstraintMaker *make) {", nameStr];
+        NSString *line0 = [NSString stringWithFormat:@"        self.%@.snp.makeConstraints { (make) in", nameStr];
         NSString *line1 = [NSString stringWithFormat:@""];
-        NSString *line2 = [NSString stringWithFormat:@"    }];"];
+        NSString *line2 = [NSString stringWithFormat:@"        }"];
         
         NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, nil];
         [itemsArray addObject:lineArrays];
     }
     
-    NSString *line3 = [NSString stringWithFormat:@"}"];
+    NSString *line3 = [NSString stringWithFormat:@"    }"];
     NSMutableArray *lineArrays1 = [[NSMutableArray alloc] initWithObjects:line3, nil];
     [itemsArray addObject:lineArrays1];
     
@@ -231,18 +230,17 @@
             
             //添加方法
             NSString *actionf2 = [NSString stringWithFormat:@""];
-            NSString *actionf1 = [NSString stringWithFormat:@"#pragma mark -- Actions"];
+            NSString *actionf1 = [NSString stringWithFormat:@"    //MARK: Actions"];
             NSString *action0 = [NSString stringWithFormat:@""];
-            NSString *action1 = [NSString stringWithFormat:@"- (void)%@Action", nameStr];
-            NSString *action2 = [NSString stringWithFormat:@"{"];
-            NSString *action3 = [NSString stringWithFormat:@"}"];
+            NSString *action1 = [NSString stringWithFormat:@"    @objc func %@Action() {", nameStr];
+            NSString *action2 = [NSString stringWithFormat:@"    }"];
             
             if (hasAddPragma) {
-                NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:action0, action1, action2, action3, nil];
+                NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:action0, action1, action2, nil];
                 [itemsArray insertObject:actionArrays atIndex:1];
             } else {
                 hasAddPragma = YES;
-                NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:actionf2, actionf1, action0, action1, action2, action3, nil];
+                NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:actionf2, actionf1, action0, action1, action2, nil];
                 [itemsArray insertObject:actionArrays atIndex:0];
             }
             
@@ -257,7 +255,7 @@
     NSMutableArray *itemsArray = [[NSMutableArray alloc] init];
     
     NSString *line0 = [NSString stringWithFormat:@""];
-    NSString *line1 = [NSString stringWithFormat:@"#pragma mark -- Getters"];
+    NSString *line1 = [NSString stringWithFormat:@"    //MARK: Lazy"];
     NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, nil];
     [itemsArray addObject:lineArrays];
     
@@ -269,76 +267,66 @@
         NSString *nameStr = self.indexsArray[i][@"name"];
         
         if ([categoryStr isEqualToString:[NSString stringWithFormat:@"UILabel"]]) {
-            NSString *line0 = [NSString stringWithFormat:@""];
-            NSString *line1 = [NSString stringWithFormat:@"- (%@ *)%@", categoryStr, nameStr];
-            NSString *line2 = [NSString stringWithFormat:@"{"];
-            NSString *line3 = [NSString stringWithFormat:@"    if (!_%@) {", nameStr];
-            NSString *line4 = [NSString stringWithFormat:@"        _%@ = [[%@ alloc] init];", nameStr, categoryStr];
-            NSString *line5 = [NSString stringWithFormat:@"        _%@.font = ;", nameStr];
-            NSString *line6 = [NSString stringWithFormat:@"        _%@.textColor = ;", nameStr];
-            NSString *line20 = [NSString stringWithFormat:@"    }"];
-            NSString *line21 = [NSString stringWithFormat:@"    return _%@;", nameStr];
-            NSString *line22 = [NSString stringWithFormat:@"}"];
+            NSString *line0 = @"";
+            NSString *line1 = [NSString stringWithFormat:@"    lazy var %@: %@ = {", nameStr, categoryStr];
+            NSString *line2 = @"        let label = UILabel()";
+            NSString *line3 = @"        label.font = UIFont.systemFont(ofSize: 18)";
+            NSString *line4 = @"        label.textColor = .white";
+            NSString *line5 = @"        return label";
+            NSString *line6 = @"    }()";
             
-            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line20, line21, line22, nil];
+            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, nil];
             [itemsArray addObject:lineArrays];
         } else if ([categoryStr isEqualToString:[NSString stringWithFormat:@"UIButton"]]) {
-            NSString *line0 = [NSString stringWithFormat:@""];
-            NSString *line1 = [NSString stringWithFormat:@"- (%@ *)%@", categoryStr, nameStr];
-            NSString *line2 = [NSString stringWithFormat:@"{"];
-            NSString *line3 = [NSString stringWithFormat:@"    if (!_%@) {", nameStr];
-            NSString *line4 = [NSString stringWithFormat:@"        _%@ = [[%@ alloc] init];", nameStr, categoryStr];
-            NSString *line5 = [NSString stringWithFormat:@"        _%@.titleLabel.font = ;", nameStr];
-            NSString *line6 = [NSString stringWithFormat:@"        [_%@ setTitle:  forState:UIControlStateNormal];", nameStr];
-            NSString *line7 = [NSString stringWithFormat:@"        [_%@ setTitleColor:  forState:UIControlStateNormal];", nameStr];
-            NSString *line8 = [NSString stringWithFormat:@"        [_%@ setImage:[UIImage imageNamed: ] forState:UIControlStateNormal];", nameStr];
-            NSString *line9 = [NSString stringWithFormat:@"        [_%@ addTarget:self action:@selector(%@Action) forControlEvents:UIControlEventTouchUpInside];", nameStr, nameStr];
+            NSString *line0 = @"";
+            NSString *line1 = [NSString stringWithFormat:@"    lazy var %@ : %@ = {", nameStr, categoryStr];
+            NSString *line2 = @"        let button = UIButton()";
+            NSString *line3 = @"        button.titleLabel?.font = UIFont.systemFont(ofSize: 18)";
+            NSString *line4 = @"        button.setTitle(\"\", for: .normal)";
+            NSString *line5 = @"        button.setTitleColor(.white, for: .normal)";
+            NSString *line6 = @"        button.setImage(UIImage(), for: .normal)";
+            NSString *line7 = [NSString stringWithFormat:@"        button.addTarget(self, action: #selector(%@Action), for: .touchUpInside)", nameStr];
+            NSString *line8 = @"        return button";
+            NSString *line9 = @"    }()";
             
-            NSString *line20 = [NSString stringWithFormat:@"    }"];
-            NSString *line21 = [NSString stringWithFormat:@"    return _%@;", nameStr];
-            NSString *line22 = [NSString stringWithFormat:@"}"];
-            
-            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line7, line8, line9, line20, line21, line22, nil];
+            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line7, line8, line9, nil];
             [itemsArray addObject:lineArrays];
             
         } else if ([categoryStr isEqualToString:[NSString stringWithFormat:@"UICollectionView"]]) {
             NSString *line0 = [NSString stringWithFormat:@""];
-            NSString *line1 = [NSString stringWithFormat:@"- (%@ *)%@", categoryStr, nameStr];
-            NSString *line2 = [NSString stringWithFormat:@"{"];
-            NSString *line3 = [NSString stringWithFormat:@"    if (!_%@) {", nameStr];
-            
-            NSString *line4 = [NSString stringWithFormat:@"        UICollectionViewFlowLayout *layout = [[UICollectionViewFlowLayout alloc] init];"];
-            NSString *line5 = [NSString stringWithFormat:@"        layout.itemSize = CGSizeMake( ,  );"];
-            NSString *line6 = [NSString stringWithFormat:@"        layout.minimumLineSpacing = ;"];
-            NSString *line7 = [NSString stringWithFormat:@"        layout.minimumInteritemSpacing = ;"];
-            NSString *line8 = [NSString stringWithFormat:@"        layout.sectionInset = UIEdgeInsetsMake( , , , );"];
-            NSString *line9 = [NSString stringWithFormat:@""];
-            NSString *line10 = [NSString stringWithFormat:@"        _%@ = [[%@ alloc] initWithFrame:CGRectZero collectionViewLayout:layout];", nameStr, categoryStr];
-            NSString *line11 = [NSString stringWithFormat:@"        _%@.delegate = self;", nameStr];
-            NSString *line12 = [NSString stringWithFormat:@"        _%@.dataSource = self;", nameStr];
-            NSString *line13 = [NSString stringWithFormat:@"        _%@.backgroundColor = [UIColor clearColor];", nameStr];
-            
-            NSMutableArray *line14Array = [NSMutableArray array];
+            NSString *line1 = [NSString stringWithFormat:@"    lazy var %@ : %@ = {", nameStr, categoryStr];
+            NSString *line2 = [NSString stringWithFormat:@"        let layout = UICollectionViewFlowLayout()"];
+            NSString *line3 = [NSString stringWithFormat:@"        layout.itemSize = CGSize(width: 0, height: 0)"];
+            NSString *line6 = [NSString stringWithFormat:@"        layout.minimumLineSpacing = 0"];
+            NSString *line7 = [NSString stringWithFormat:@"        layout.minimumInteritemSpacing = 0"];
+            NSString *line8 = [NSString stringWithFormat:@"        layout.sectionInset = UIEdgeInsets.zero"];
+            NSString *line9 = [NSString stringWithFormat:@"        layout.scrollDirection = .horizontal"];
+            NSString *line10 = [NSString stringWithFormat:@""];
+            NSString *line11 = [NSString stringWithFormat:@"        let collectionView = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)"];
+            NSString *line12 = [NSString stringWithFormat:@"        collectionView.dataSource = self"];
+            NSString *line13 = [NSString stringWithFormat:@"        collectionView.dataSource = self"];
+            NSString *line14 = [NSString stringWithFormat:@"        collectionView.backgroundColor = UIColor.clear"];
+            NSMutableArray *line15Array = [NSMutableArray array];
             for (NSString *cellName in self.cellsArray) {
-                NSString *line14 = [NSString stringWithFormat:@"        [_%@ registerClass:[%@ class] forCellWithReuseIdentifier:[%@ reuseIdentifier]];", nameStr, cellName, cellName];
-                [line14Array addObject:line14];
+                NSString *line15 = [NSString stringWithFormat:@"        collectionView.register(%@.self, forCellWithReuseIdentifier: %@.reuseIdentifier())", cellName, cellName];
+                [line15Array addObject:line15];
             }
             for (NSString *headerName in self.headersArray) {
-                NSString *line14 = [NSString stringWithFormat:@"        [_%@ registerClass:[%@ class] forSupplementaryViewOfKind:UICollectionElementKindSectionHeader withReuseIdentifier:[%@ reuseIdentifier]];", nameStr, headerName, headerName];
-                [line14Array addObject:line14];
+                NSString *line15 = [NSString stringWithFormat:@"        collectionView.register(%@.self, forSupplementaryViewOfKind: .elementKindSectionHeader, withReuseIdentifier: %@.reuseIdentifier())", headerName, headerName];
+                [line15Array addObject:line15];
             }
             for (NSString *footerName in self.footersArray) {
-                NSString *line14 = [NSString stringWithFormat:@"        [_%@ registerClass:[%@ class] forSupplementaryViewOfKind:UICollectionElementKindSectionFooter withReuseIdentifier:[%@ reuseIdentifier]];", nameStr, footerName, footerName];
-                [line14Array addObject:line14];
+                NSString *line15 = [NSString stringWithFormat:@"        collectionView.register(%@.self, forSupplementaryViewOfKind: .elementKindSectionFooter, withReuseIdentifier: %@.reuseIdentifier())", footerName, footerName];
+                [line15Array addObject:line15];
             }
             
-            NSString *line15 = [NSString stringWithFormat:@"    }"];
-            NSString *line16 = [NSString stringWithFormat:@"    return _%@;", nameStr];
-            NSString *line17 = [NSString stringWithFormat:@"}"];
+            NSString *line16 = [NSString stringWithFormat:@""];
+            NSString *line17 = [NSString stringWithFormat:@"        return collectionView"];
+            NSString *line18 = [NSString stringWithFormat:@"    }()"];
             
-            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line7, line8, line9, line10, line11, line12, line13, nil];
-            [lineArrays addObjectsFromArray:line14Array];
-            [lineArrays addObjectsFromArray:@[line15, line16, line17]];
+            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line6, line7, line8, line9, line10, line11, line12, line13, line14, nil];
+            [lineArrays addObjectsFromArray:line15Array];
+            [lineArrays addObjectsFromArray:@[line16, line17, line18]];
             [itemsArray addObject:lineArrays];
             
             //添加datasource，delegate方法
@@ -349,43 +337,39 @@
             
             //添加方法
             NSString *action0 = [NSString stringWithFormat:@""];
-            NSString *action1 = [NSString stringWithFormat:@"#pragma mark -- UICollectionView"];
+            NSString *action1 = [NSString stringWithFormat:@"    //MARK: UICollectionView"];
             NSString *action1to2 = [NSString stringWithFormat:@""];
-            NSString *action2 = [NSString stringWithFormat:@"- (NSInteger)collectionView:(UICollectionView *)collectionView numberOfItemsInSection:(NSInteger)section"];
-            NSString *action3 = [NSString stringWithFormat:@"{"];
-            NSString *action4 = [NSString stringWithFormat:@"    return 0;"];
-            NSString *action5 = [NSString stringWithFormat:@"}"];
-            NSString *action6 = [NSString stringWithFormat:@""];
-            NSString *action7 = [NSString stringWithFormat:@"- (__kindof UICollectionViewCell *)collectionView:(UICollectionView *)collectionView cellForItemAtIndexPath:(NSIndexPath *)indexPath"];
-            NSString *action8 = [NSString stringWithFormat:@"{"];
+            NSString *action2 = [NSString stringWithFormat:@"    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {"];
+            NSString *action3 = [NSString stringWithFormat:@"        return 0"];
+            NSString *action4 = [NSString stringWithFormat:@"    }"];
+            NSString *action5 = [NSString stringWithFormat:@""];
+            NSString *action6 = [NSString stringWithFormat:@"    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {"];
+            NSString *action7 = [NSString stringWithFormat:@""];
             
             NSString *cellName = @"";
             if (self.cellsArray.count) {
                 cellName = self.cellsArray.firstObject;
             }
-            NSString *action9 = [NSString stringWithFormat:@"    %@ *cell = [collectionView dequeueReusableCellWithReuseIdentifier:[%@ reuseIdentifier] forIndexPath:indexPath];", cellName, cellName];
+            NSString *action9 = [NSString stringWithFormat:@"        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: %@.reuseIdentifier(), for: indexPath) as! %@", cellName, cellName];
             
-            NSString *action10 = [NSString stringWithFormat:@"    return cell;"];
-            NSString *action11 = [NSString stringWithFormat:@"}"];
+            NSString *action10 = [NSString stringWithFormat:@"        return cell"];
+            NSString *action11 = [NSString stringWithFormat:@"    }"];
             NSString *action12 = [NSString stringWithFormat:@""];
-            NSString *action13 = [NSString stringWithFormat:@"- (void)collectionView:(UICollectionView *)collectionView didSelectItemAtIndexPath:(NSIndexPath *)indexPath"];
-            NSString *action14 = [NSString stringWithFormat:@"{"];
-            NSString *action15 = [NSString stringWithFormat:@"}"];
+            NSString *action13 = [NSString stringWithFormat:@"    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {"];
+            NSString *action14 = [NSString stringWithFormat:@""];
+            NSString *action15 = [NSString stringWithFormat:@"    }"];
             
-            NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:action0, action1, action1to2, action2, action3, action4, action5, action6, action7, action8, action9, action10, action11, action12, action13, action14, action15, nil];
+            NSMutableArray *actionArrays = [[NSMutableArray alloc] initWithObjects:action0, action1, action1to2, action2, action3, action4, action5, action6, action7, action9, action10, action11, action12, action13, action14, action15, nil];
             [itemsArray insertObject:actionArrays atIndex:0];
             
         } else {
             NSString *line0 = [NSString stringWithFormat:@""];
-            NSString *line1 = [NSString stringWithFormat:@"- (%@ *)%@", categoryStr, nameStr];
-            NSString *line2 = [NSString stringWithFormat:@"{"];
-            NSString *line3 = [NSString stringWithFormat:@"    if (!_%@) {", nameStr];
-            NSString *line4 = [NSString stringWithFormat:@"        _%@ = [[%@ alloc] init];", nameStr, categoryStr];
-            NSString *line5 = [NSString stringWithFormat:@"    }"];
-            NSString *line6 = [NSString stringWithFormat:@"    return _%@;", nameStr];
-            NSString *line7 = [NSString stringWithFormat:@"}"];
+            NSString *line1 = [NSString stringWithFormat:@"    lazy var %@ : %@ = {", nameStr, categoryStr];
+            NSString *line2 = [NSString stringWithFormat:@"        let %@ = UIView()", nameStr];
+            NSString *line3 = [NSString stringWithFormat:@"        return %@", nameStr];
+            NSString *line4 = [NSString stringWithFormat:@"    }()"];
             
-            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, line5, line6, line7, nil];
+            NSMutableArray *lineArrays = [[NSMutableArray alloc] initWithObjects:line0, line1, line2, line3, line4, nil];
             [itemsArray addObject:lineArrays];
         }
     }
