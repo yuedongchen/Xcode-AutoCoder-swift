@@ -304,7 +304,7 @@
             NSString *line10 = [NSString stringWithFormat:@""];
             NSString *line11 = [NSString stringWithFormat:@"        let collectionView = UICollectionView.init(frame: CGRect.zero, collectionViewLayout: layout)"];
             NSString *line12 = [NSString stringWithFormat:@"        collectionView.dataSource = self"];
-            NSString *line13 = [NSString stringWithFormat:@"        collectionView.dataSource = self"];
+            NSString *line13 = [NSString stringWithFormat:@"        collectionView.delegate = self"];
             NSString *line14 = [NSString stringWithFormat:@"        collectionView.backgroundColor = UIColor.clear"];
             NSMutableArray *line15Array = [NSMutableArray array];
             for (NSString *cellName in self.cellsArray) {
@@ -365,7 +365,7 @@
         } else {
             NSString *line0 = [NSString stringWithFormat:@""];
             NSString *line1 = [NSString stringWithFormat:@"    lazy var %@ : %@ = {", nameStr, categoryStr];
-            NSString *line2 = [NSString stringWithFormat:@"        let %@ = UIView()", nameStr];
+            NSString *line2 = [NSString stringWithFormat:@"        let %@ = %@()", nameStr, categoryStr];
             NSString *line3 = [NSString stringWithFormat:@"        return %@", nameStr];
             NSString *line4 = [NSString stringWithFormat:@"    }()"];
             
